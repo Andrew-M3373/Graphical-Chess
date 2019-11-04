@@ -1,12 +1,14 @@
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-import java.io.File;
-import javax.imageio.ImageIO;
+
+//import java.awt.image.BufferedImage;
+//import java.io.IOException;
+//import java.net.URL;
+//import java.io.File;
+//import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.util.Scanner;
-public class PlayChess extends Canvas
+//import java.util.Scanner;
+
+public class PlayChess extends JFrame
 	{
 		static int className;
 		static JFrame frame = new JFrame();
@@ -16,32 +18,42 @@ public class PlayChess extends Canvas
 		static int color2 = 1;
 		static String name1;
 		static String name2;
+		static boolean stillPlaying = true;
+		static ImageIcon king;
 
 		
 		public static void main(String[] args)
 			{
-				PlayChess canvas = new PlayChess();
+//				PlayChess canvas = new PlayChess();
 		        JFrame frame = new JFrame();
-		        ImageIcon king = new ImageIcon("King3.png");
-		        JLabel label = new JLabel(king);
-		        frame.add(label);
 		        frame.pack();
 		        frame.setSize(800, 800);
 		        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		        frame.getContentPane().add(canvas).setBackground(Color.white);
-		        frame.setLocationRelativeTo(null); //Sets JPanel to center of screen 
+		        frame.setLayout(null);
+		        frame.getContentPane().setBackground(Color.YELLOW);
+		        frame.setLocationRelativeTo(null);; //Sets JPanel to center of screen 
 		        frame.setResizable(true);
 		        frame.setVisible(true);
 		        
-		        
-		        graphicallyGreetPlayer();
+		        showCurrentBoard();
+		        greetPlayer();
 		        ChessPieceDatabase.loadData();
+//		        while(stillPlaying)
+//		        {
+//		        	showCurrentBoard();
+//		        }
 			}
 
-		private static void graphicallyGreetPlayer()
+		private static void greetPlayer()
 			{
+				final JFrame frame = new JFrame();
+				JOptionPane.showMessageDialog(frame, "Welcome to the Game of Chess!!");
 				name1 = JOptionPane.showInputDialog("Player 1, what is your name?");
-				if(name1.length() == 1)
+				if(name1.isEmpty())
+				{
+					cancelGame();
+				}
+				else if(name1.length() == 1)
 					{
 						name1.substring(0).toUpperCase();
 					}
@@ -51,7 +63,11 @@ public class PlayChess extends Canvas
 					}
 				JOptionPane.showMessageDialog(frame, "Welcome to chess, " + name1 + "!");
 				name2 = JOptionPane.showInputDialog("Player 2, what is your name?");
-				if(name2.length() == 1)
+				if(name2.isEmpty())
+				{
+					cancelGame();
+				}
+				else if(name2.length() == 1)
 					{
 						name2.substring(0).toUpperCase();
 					}
@@ -61,18 +77,20 @@ public class PlayChess extends Canvas
 					}
 				JOptionPane.showMessageDialog(frame, "Welcome to chess, " + name2 + "!");
 				
-				final String[] colorOptions = {"Black", "White" };
-				final JFrame frame = new JFrame();
+				final String[] colorOptions = {"Black", "White", "Cancel"};
 			    String colorType = (String) JOptionPane.showInputDialog(
 			    		frame, 
-			            name1 + " , Which color chess pieces would you like to use?",
+			            name1 + ", which color chess pieces would you like to use?",
 			            "Which color?",
 			            JOptionPane.QUESTION_MESSAGE,
 			            null, 
 			            colorOptions, 
 			            colorOptions[0]);
-			    JOptionPane.showMessageDialog(frame, "Player 1, " + name1 + ", you will start first. Are you ready to play?");
-			    if(colorType.equals("White"))
+			    if(colorType.equals("Cancel"))
+			    {
+			    	cancelGame();
+			    }
+			    else if(colorType.equals("White"))
 			    	{
 			    		color1 = 0;
 			    		color2 = 1;
@@ -82,32 +100,41 @@ public class PlayChess extends Canvas
 			    		color1 = 1;
 			    		color2 = 0;
 			    	}
+			    if (JOptionPane.showConfirmDialog(frame, name1 + ", you will start first. Are you ready to play?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+			    {
+			    	cancelGame();
+			    }
 			}
+		
+		public static void showCurrentBoard()
+		{
+			king = new ImageIcon(new ImageIcon("KingBW.png").getImage().getScaledInstance(80, 80, Image.SCALE_AREA_AVERAGING));
+			JLabel label = new JLabel(king);
+			frame.add(label);
+			Dimension size = label.getPreferredSize();
+			label.setBounds(100, 100, size.width, size.height);
+		}
 		
 		public void paint(Graphics graphics)
 		{
-			graphics.setColor(new Color(0,255,0));
-//			graphics
-	        ImageIcon king = new ImageIcon("King.png");
-	        
+			
 		}
 		
-		public BufferedImage scaleImage(int WIDTH, int HEIGHT, String filename)
+//		public static Image getScaledImage(Image srcImg, int w, int h)
+//		{
+//			BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+//			Graphics2D g2 = resizedImg.createGraphics();
+//			
+//			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+//			g2.drawImage(srcImg, 0, 0, w, h, null);
+//			g2.dispose();
+//			
+//			return resizedImg;
+//		}
+		
+		public static void cancelGame()
 		{
-			BufferedImage bi = null;
-			try
-				{
-					ImageIcon ii = new ImageIcon("King.png");
-					bi = new BufferedImage(25, 25, BufferedImage.TYPE_INT_RGB);
-					Graphics2D g2d = (Graphics2D) bi.createGraphics();
-					g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
-					g2d.drawImage(ii.getImage(), 0, 0, 25, 25, null);
-				}
-			catch (Exception e)
-				{
-					e.printStackTrace();
-					return null;
-				}
-			return bi;
+			JOptionPane.showMessageDialog(frame, "Sorry to see you leave, but thanks for playing while you could!");
+			System.exit(0);
 		}
 	}
