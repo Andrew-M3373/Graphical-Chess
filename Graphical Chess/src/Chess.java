@@ -6,14 +6,24 @@ public class Chess
 		private String pieceName;
 		private int isPieceAlive;
 		private int color;
+		private String file;
 		
-		public Chess(int x, int y, String n, int a, int c)
+		public Chess(int x, int y, String n, int a, int c, String f)
 		{
 			xCoordinate = x;
 			yCoordinate = y;
 			pieceName = n;
 			isPieceAlive = a;
 			color = c;
+			file = f;
+		}
+
+		public String getFile() {
+			return file;
+		}
+
+		public void setFile(String file) {
+			this.file = file;
 		}
 
 		public int getColor()

@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 //import java.awt.image.BufferedImage;
 //import java.io.IOException;
@@ -8,9 +9,8 @@ import java.awt.*;
 import javax.swing.*;
 //import java.util.Scanner;
 
-public class PlayChess extends JFrame
+public class PlayChess extends Canvas
 	{
-		static int className;
 		static JFrame frame = new JFrame();
 		private static final long	serialVersionUID	= 1L;
 		static int largeness = 0;
@@ -19,29 +19,63 @@ public class PlayChess extends JFrame
 		static String name1;
 		static String name2;
 		static boolean stillPlaying = true;
-		static ImageIcon king;
+		static ImageIcon piece;
+		static ImageIcon checkerboard;
+		static int SearchInt;
+		static String xyPlayerOne;
+		static String x1;
+		static String y1;
+		static String xyPlayerTwo;
+		static String x2;
+		static String y2;
+		static String pieceName;
+		static String x;
+		static String toMoveTo1;
+		static String toMoveTo2;
 
 		
 		public static void main(String[] args)
 			{
-//				PlayChess canvas = new PlayChess();
-		        JFrame frame = new JFrame();
+		        final JFrame frame = new JFrame("Chess Game");
 		        frame.pack();
-		        frame.setSize(800, 800);
+		        frame.setSize(840, 800);
 		        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		        frame.setLayout(null);
 		        frame.getContentPane().setBackground(Color.YELLOW);
 		        frame.setLocationRelativeTo(null);; //Sets JPanel to center of screen 
 		        frame.setResizable(true);
 		        frame.setVisible(true);
-		        
-		        showCurrentBoard();
+
 		        greetPlayer();
 		        ChessPieceDatabase.loadData();
-//		        while(stillPlaying)
-//		        {
-//		        	showCurrentBoard();
-//		        }
+		        
+		        while(stillPlaying)
+		        {
+		        	// The following initiates all of the images and places them in the JFrame
+		        	for(Chess c: ChessPieceDatabase.chessPieces)
+		        	{
+//		        		JLabel label = new JLabel("A");
+//		        		label.setFont(new Font("Arial", 30, 30));
+//		        		label.setBounds(0, 0, 200, 50);;
+//		        		frame.add(label);
+				        piece = new ImageIcon(new ImageIcon(c.getFile()).getImage().getScaledInstance(80, 80, Image.SCALE_AREA_AVERAGING));
+						JLabel pieceLabel = new JLabel(piece);
+						frame.add(pieceLabel);
+						Dimension pieceSize = pieceLabel.getPreferredSize();
+						pieceLabel.setBounds(100 + (80*c.getxCoordinate()), 20 + (80*c.getyCoordinate()), pieceSize.width, pieceSize.height);
+		        	}
+		        	// The following creates the background of the chess board
+			        checkerboard = new ImageIcon(new ImageIcon("Checkerboard.png").getImage().getScaledInstance(640, 640, Image.SCALE_AREA_AVERAGING));
+			        JLabel checkerboardLabel = new JLabel(checkerboard);
+			        frame.add(checkerboardLabel);
+			        Dimension checkerboardSize = checkerboardLabel.getPreferredSize();
+			        checkerboardLabel.setBounds(100, 20, checkerboardSize.width, checkerboardSize.height);
+			        
+			        oneSecondDelay();
+			        
+			        playerOneMove();
+			        playerTwoMove();
+		        }
 			}
 
 		private static void greetPlayer()
@@ -105,32 +139,81 @@ public class PlayChess extends JFrame
 			    	cancelGame();
 			    }
 			}
-		
-		public static void showCurrentBoard()
+
+		private static void playerOneMove() 
 		{
-			king = new ImageIcon(new ImageIcon("KingBW.png").getImage().getScaledInstance(80, 80, Image.SCALE_AREA_AVERAGING));
-			JLabel label = new JLabel(king);
-			frame.add(label);
-			Dimension size = label.getPreferredSize();
-			label.setBounds(100, 100, size.width, size.height);
+			final JFrame frame = new JFrame();
+			JOptionPane.showMessageDialog(frame, name1 + ", it is your turn.");
+			xyPlayerOne = JOptionPane.showInputDialog("Please type the complete coordinates \nof the piece you would like to move. \n(Example: b3)")
+					.substring(0).toLowerCase();
+			x1 = xyPlayerOne.substring(0,1);
+			y1 = xyPlayerOne.substring(1);
+			for(Chess c: ChessPieceDatabase.chessPieces)
+			{
+				switch(c.getyCoordinate())
+				{
+				case 0: 
+					x = "a"; 
+					break;
+				case 1: 
+					x = "b"; 
+					break;
+				case 2: 
+					x = "c"; 
+					break;
+				case 3: 
+					x = "d"; 
+					break;
+				case 4: 
+					x = "e"; 
+					break;
+				case 5: 
+					x = "f"; 
+					break;
+				case 6: 
+					x = "g"; 
+					break;
+				case 7: 
+					x = "h"; 
+					break;
+				}
+				if(y1.equals(c.getyCoordinate()) && x1.equals(x))
+				{
+					pieceName = c.getPieceName();
+					movePiece();
+				}
+			}
 		}
-		
-		public void paint(Graphics graphics)
+
+		private static void playerTwoMove() 
 		{
-			
+			final JFrame frame = new JFrame();
+			JOptionPane.showMessageDialog(frame, name2 + ", it is your turn.");
 		}
-		
-//		public static Image getScaledImage(Image srcImg, int w, int h)
-//		{
-//			BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-//			Graphics2D g2 = resizedImg.createGraphics();
-//			
-//			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-//			g2.drawImage(srcImg, 0, 0, w, h, null);
-//			g2.dispose();
-//			
-//			return resizedImg;
-//		}
+
+		private static void movePiece() 
+		{
+			final JFrame frame = new JFrame();
+			JOptionPane.showMessageDialog(frame, "You have chosen to move your " + pieceName);
+			if(pieceName.equals("Pawn"))
+			{
+//				toMoveTo1 = (String) JOptionPane.showInputDialog(frame, 
+//						"You have the following options to move your " + pieceName + " to.", 
+//						"Which spot?", 
+//						JOptionPane.QUESTION_MESSAGE, 
+//						null, 
+//						, possibleMoves.get(0));
+			}
+		}
+
+		private static void oneSecondDelay() 
+		{
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		public static void cancelGame()
 		{
